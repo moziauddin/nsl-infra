@@ -1,0 +1,19 @@
+{
+  "postgresql_databases": [
+    {
+      "name": "nsl_test"
+    }
+  ],
+  "postgresql_users": [
+    {
+      "name": "nsldev",
+      "password": "nsldev",
+      "state": "present"
+    },
+    {
+      "name": "nsldev",
+      "password": "nsldev",
+      "state": "present"
+    }
+  ]
+}
