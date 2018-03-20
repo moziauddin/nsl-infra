@@ -51,10 +51,10 @@
         drop constraint if exists FK_f6s94njexmutjxjv8t5dy1ugt;
 
     alter table if exists instance_resources 
-        drop constraint if exists FK_49ic33s4xgbdoa4p5j107rtpf;
+        drop constraint if exists FK_8mal9hru5u3ypaosfoju8ulpd;
 
     alter table if exists instance_resources 
-        drop constraint if exists FK_8mal9hru5u3ypaosfoju8ulpd;
+        drop constraint if exists FK_49ic33s4xgbdoa4p5j107rtpf;
 
     alter table if exists name 
         drop constraint if exists FK_airfjupm6ohehj1lj82yqkwdx;
@@ -70,6 +70,9 @@
 
     alter table if exists name 
         drop constraint if exists FK_rp659tjcxokf26j8551k6an2y;
+
+    alter table if exists name 
+        drop constraint if exists FK_whce6pgnqjtxgt67xy2lfo34;
 
     alter table if exists name 
         drop constraint if exists FK_sk2iikq8wla58jeypkw6h74hc;
@@ -95,12 +98,6 @@
     alter table if exists name 
         drop constraint if exists FK_dqhn53mdh0n77xhsw7l5dgd38;
 
-    alter table if exists name_part 
-        drop constraint if exists FK_s13ituehdpf6uh859umme7g1j;
-
-    alter table if exists name_part 
-        drop constraint if exists FK_pj38oewhgjq8rp08fc9cviteu;
-
     alter table if exists name_rank 
         drop constraint if exists FK_p3lpayfbl9s3hshhoycfj82b9;
 
@@ -118,21 +115,6 @@
 
     alter table if exists name_tag_name 
         drop constraint if exists FK_2uiijd73snf6lh5s6a82yjfin;
-
-    alter table if exists name_tree_path 
-        drop constraint if exists FK_4kc2kv5choyybkaetmshegbet;
-
-    alter table if exists name_tree_path 
-        drop constraint if exists FK_j4j0kq9duod9gm019pl1xec7c;
-
-    alter table if exists name_tree_path 
-        drop constraint if exists FK_try5dwb6jcy5fngk09bf7f7on;
-
-    alter table if exists name_tree_path 
-        drop constraint if exists FK_sfj3hoevcuni3ak7no6byjp3;
-
-    alter table if exists name_tree_path 
-        drop constraint if exists FK_3xnmxe5p6ed258euacrfflwrj;
 
     alter table if exists name_type 
         drop constraint if exists FK_10d0jlulq2woht49j5ccpeehu;
@@ -170,6 +152,12 @@
     alter table if exists resource 
         drop constraint if exists FK_l76e0lo0edcngyyqwkmkgywj9;
 
+    alter table if exists tree 
+        drop constraint if exists FK_svg2ee45qvpomoer2otdc5oyc;
+
+    alter table if exists tree 
+        drop constraint if exists FK_48skgw51tamg6ud4qa8oh0ycm;
+
     alter table if exists tree_arrangement 
         drop constraint if exists FK_akuqsiv75wpw6mk3m8gj6g30m;
 
@@ -178,6 +166,9 @@
 
     alter table if exists tree_arrangement 
         drop constraint if exists FK_fvfq13j3dqv994o9vg54yj5kk;
+
+    alter table if exists tree_element 
+        drop constraint if exists FK_5sv181ivf7oybb6hud16ptmo5;
 
     alter table if exists tree_event 
         drop constraint if exists FK_7y8cj9fpsh1sblm744xuq6i1g;
@@ -236,6 +227,21 @@
     alter table if exists tree_value_uri 
         drop constraint if exists FK_nw785lqesvg8ntfaper0tw2vs;
 
+    alter table if exists tree_version 
+        drop constraint if exists FK_tiniptsqbb5fgygt1idm1isfy;
+
+    alter table if exists tree_version 
+        drop constraint if exists FK_4q3huja5dv8t9xyvt5rg83a35;
+
+    alter table if exists tree_version_element 
+        drop constraint if exists FK_8nnhwv8ldi9ppol6tg4uwn4qv;
+
+    alter table if exists tree_version_element 
+        drop constraint if exists FK_ufme7yt6bqyf3uxvuvouowhh;
+
+    alter table if exists tree_version_element 
+        drop constraint if exists FK_80khvm60q13xwqgpy43twlnoe;
+
     drop table if exists author cascade;
 
     drop table if exists comment cascade;
@@ -243,6 +249,8 @@
     drop table if exists db_version cascade;
 
     drop table if exists delayed_jobs cascade;
+
+    drop table if exists distribution cascade;
 
     drop table if exists help_topic cascade;
 
@@ -268,8 +276,6 @@
 
     drop table if exists name_group cascade;
 
-    drop table if exists name_part cascade;
-
     drop table if exists name_rank cascade;
 
     drop table if exists name_status cascade;
@@ -277,8 +283,6 @@
     drop table if exists name_tag cascade;
 
     drop table if exists name_tag_name cascade;
-
-    drop table if exists name_tree_path cascade;
 
     drop table if exists name_type cascade;
 
@@ -300,7 +304,11 @@
 
     drop table if exists site cascade;
 
+    drop table if exists tree cascade;
+
     drop table if exists tree_arrangement cascade;
+
+    drop table if exists tree_element cascade;
 
     drop table if exists tree_event cascade;
 
@@ -311,6 +319,10 @@
     drop table if exists tree_uri_ns cascade;
 
     drop table if exists tree_value_uri cascade;
+
+    drop table if exists tree_version cascade;
+
+    drop table if exists tree_version_element cascade;
 
     drop table if exists user_query cascade;
 
@@ -380,6 +392,18 @@
         queue varchar(4000),
         run_at timestamp with time zone,
         updated_at timestamp with time zone not null,
+        primary key (id)
+    );
+
+    create table distribution (
+        id int8 default nextval('nsl_global_seq') not null,
+        lock_version int8 default 0 not null,
+        description varchar(100) not null,
+        is_doubtfully_naturalised boolean default false not null,
+        is_extinct boolean default false not null,
+        is_native boolean default false not null,
+        is_naturalised boolean default false not null,
+        region varchar(10) not null,
         primary key (id)
     );
 
@@ -464,8 +488,8 @@
     );
 
     create table instance_resources (
-        resource_id int8 not null,
         instance_id int8 not null,
+        resource_id int8 not null,
         primary key (instance_id, resource_id)
     );
 
@@ -522,9 +546,11 @@
         duplicate_of_id int8,
         ex_author_id int8,
         ex_base_author_id int8,
+        family_id int8,
         full_name varchar(512),
         full_name_html varchar(2048),
         name_element varchar(255),
+        name_path text not null,
         name_rank_id int8 not null,
         name_status_id int8 not null,
         name_type_id int8 not null,
@@ -566,15 +592,6 @@
         description_html text,
         name varchar(50),
         rdf_id varchar(50),
-        primary key (id)
-    );
-
-    create table name_part (
-        id int8 default nextval('nsl_global_seq') not null,
-        lock_version int8 default 0 not null,
-        name_id int8 not null,
-        preceding_name_id int8 not null,
-        preceding_name_type varchar(50) not null,
         primary key (id)
     );
 
@@ -627,21 +644,6 @@
         updated_at timestamp with time zone not null,
         updated_by varchar(255) not null,
         primary key (name_id, tag_id)
-    );
-
-    create table name_tree_path (
-        id int8 default nextval('hibernate_sequence') not null,
-        version int8 not null,
-        family_id int8,
-        inserted int8 not null,
-        name_id int8 not null,
-        name_id_path TEXT not null,
-        name_path TEXT not null,
-        next_id int8,
-        parent_id int8,
-        rank_path TEXT not null,
-        tree_id int8 not null,
-        primary key (id)
     );
 
     create table name_type (
@@ -789,6 +791,21 @@
         primary key (id)
     );
 
+    create table tree (
+        id int8 default nextval('nsl_global_seq') not null,
+        lock_version int8 default 0 not null,
+        accepted_tree boolean default false not null,
+        config jsonb,
+        current_tree_version_id int8,
+        default_draft_tree_version_id int8,
+        description_html Text default 'Edit me' not null,
+        group_name Text not null,
+        link_to_home_page Text,
+        name Text not null,
+        reference_id int8,
+        primary key (id)
+    );
+
     create table tree_arrangement (
         id int8 default nextval('nsl_global_seq') not null,
         lock_version int8 default 0 not null,
@@ -802,6 +819,29 @@
         shared boolean,
         is_synthetic bpchar not null,
         title varchar(50),
+        primary key (id)
+    );
+
+    create table tree_element (
+        id int8 default nextval('nsl_global_seq') not null,
+        lock_version int8 default 0 not null,
+        display_html Text not null,
+        excluded boolean default false not null,
+        instance_id int8 not null,
+        instance_link Text not null,
+        name_element varchar(255) not null,
+        name_id int8 not null,
+        name_link Text not null,
+        previous_element_id int8,
+        profile jsonb,
+        rank varchar(50) not null,
+        simple_name Text not null,
+        source_element_link Text,
+        source_shard Text not null,
+        synonyms jsonb,
+        synonyms_html Text not null,
+        updated_at timestamp with time zone not null,
+        updated_by varchar(255) not null,
         primary key (id)
     );
 
@@ -882,6 +922,36 @@
         sort_order int4 not null,
         title varchar(50) not null,
         primary key (id)
+    );
+
+    create table tree_version (
+        id int8 default nextval('nsl_global_seq') not null,
+        lock_version int8 default 0 not null,
+        created_at timestamp with time zone not null,
+        created_by varchar(255) not null,
+        draft_name Text not null,
+        log_entry Text,
+        previous_version_id int8,
+        published boolean default false not null,
+        published_at timestamp with time zone,
+        published_by varchar(100),
+        tree_id int8 not null,
+        primary key (id)
+    );
+
+    create table tree_version_element (
+        element_link Text not null,
+        depth int4 not null,
+        name_path Text not null,
+        parent_id Text,
+        taxon_id int8 not null,
+        taxon_link Text not null,
+        tree_element_id int8 not null,
+        tree_path Text not null,
+        tree_version_id int8 not null,
+        updated_at timestamp with time zone not null,
+        updated_by varchar(255) not null,
+        primary key (element_link)
     );
 
     create table user_query (
@@ -994,6 +1064,8 @@
 
     create index Name_Name_Element_Index on name (name_element);
 
+    create index name_name_path_Index on name (name_path);
+
     create index Name_Rank_Index on name (name_rank_id);
 
     create index Name_Status_Index on name (name_status_id);
@@ -1022,8 +1094,6 @@
     alter table if exists name_group 
         add constraint UK_5185nbyw5hkxqyyqgylfn2o6d  unique (name);
 
-    create index preceding_name_type_Index on name_part (preceding_name_type);
-
     alter table if exists name_status 
         add constraint UK_se7crmfnhjmyvirp3p9hiqerx  unique (name);
 
@@ -1033,14 +1103,6 @@
     create index Name_Tag_Name_Index on name_tag_name (name_id);
 
     create index Name_Tag_Tag_Index on name_tag_name (tag_id);
-
-    create index name_tree_path_family_index on name_tree_path (family_id);
-
-    create index name_tree_path_name_index on name_tree_path (name_id);
-
-    create index name_tree_path_treename_index on name_tree_path (name_id, tree_id);
-
-    create index name_tree_path_path_index on name_tree_path (name_id_path);
 
     alter table if exists name_type 
         add constraint UK_314uhkq8i7r46050kd1nfrs95  unique (name);
@@ -1074,9 +1136,20 @@
     alter table if exists shard_config 
         add constraint UK_e6nvv3knohggqpdn247bodpxy  unique (name);
 
+    alter table if exists tree 
+        add constraint UK_92xj3n7tgp4h7abxijoo7skmp  unique (name);
+
     create index tree_arrangement_label on tree_arrangement (label, namespace_id);
 
     create index tree_arrangement_node on tree_arrangement (node_id);
+
+    create index tree_element_instance_index on tree_element (instance_id);
+
+    create index tree_element_name_index on tree_element (name_id);
+
+    create index tree_element_previous_index on tree_element (previous_element_id);
+
+    create index tree_simple_name_index on tree_element (simple_name);
 
     create index tree_link_subnode on tree_link (subnode_id);
 
@@ -1123,6 +1196,22 @@
     create index node_uri_index on tree_value_uri (node_uri_id_part, node_uri_ns_part_id, root_id);
 
     create index by_root_id on tree_value_uri (root_id);
+
+    create index tree_version_element_link_index on tree_version_element (element_link);
+
+    create index tree_name_path_index on tree_version_element (name_path);
+
+    create index tree_version_element_parent_index on tree_version_element (parent_id);
+
+    create index tree_version_element_taxon_id_index on tree_version_element (taxon_id);
+
+    create index tree_version_element_taxon_link_index on tree_version_element (taxon_link);
+
+    create index tree_version_element_element_index on tree_version_element (tree_element_id);
+
+    create index tree_path_index on tree_version_element (tree_path);
+
+    create index tree_version_element_version_index on tree_version_element (tree_version_id);
 
     alter table if exists why_is_this_here 
         add constraint UK_sv1q1i7xve7xgmkwvmdbeo1mb  unique (name);
@@ -1213,14 +1302,14 @@
         references namespace;
 
     alter table if exists instance_resources 
-        add constraint FK_49ic33s4xgbdoa4p5j107rtpf 
-        foreign key (instance_id) 
-        references instance;
-
-    alter table if exists instance_resources 
         add constraint FK_8mal9hru5u3ypaosfoju8ulpd 
         foreign key (resource_id) 
         references resource;
+
+    alter table if exists instance_resources 
+        add constraint FK_49ic33s4xgbdoa4p5j107rtpf 
+        foreign key (instance_id) 
+        references instance;
 
     alter table if exists name 
         add constraint FK_airfjupm6ohehj1lj82yqkwdx 
@@ -1246,6 +1335,11 @@
         add constraint FK_rp659tjcxokf26j8551k6an2y 
         foreign key (ex_base_author_id) 
         references author;
+
+    alter table if exists name 
+        add constraint FK_whce6pgnqjtxgt67xy2lfo34 
+        foreign key (family_id) 
+        references name;
 
     alter table if exists name 
         add constraint FK_sk2iikq8wla58jeypkw6h74hc 
@@ -1287,16 +1381,6 @@
         foreign key (why_is_this_here_id) 
         references why_is_this_here;
 
-    alter table if exists name_part 
-        add constraint FK_s13ituehdpf6uh859umme7g1j 
-        foreign key (name_id) 
-        references name;
-
-    alter table if exists name_part 
-        add constraint FK_pj38oewhgjq8rp08fc9cviteu 
-        foreign key (preceding_name_id) 
-        references name;
-
     alter table if exists name_rank 
         add constraint FK_p3lpayfbl9s3hshhoycfj82b9 
         foreign key (name_group_id) 
@@ -1326,31 +1410,6 @@
         add constraint FK_2uiijd73snf6lh5s6a82yjfin 
         foreign key (tag_id) 
         references name_tag;
-
-    alter table if exists name_tree_path 
-        add constraint FK_4kc2kv5choyybkaetmshegbet 
-        foreign key (family_id) 
-        references name;
-
-    alter table if exists name_tree_path 
-        add constraint FK_j4j0kq9duod9gm019pl1xec7c 
-        foreign key (name_id) 
-        references name;
-
-    alter table if exists name_tree_path 
-        add constraint FK_try5dwb6jcy5fngk09bf7f7on 
-        foreign key (next_id) 
-        references name_tree_path;
-
-    alter table if exists name_tree_path 
-        add constraint FK_sfj3hoevcuni3ak7no6byjp3 
-        foreign key (parent_id) 
-        references name_tree_path;
-
-    alter table if exists name_tree_path 
-        add constraint FK_3xnmxe5p6ed258euacrfflwrj 
-        foreign key (tree_id) 
-        references tree_arrangement;
 
     alter table if exists name_type 
         add constraint FK_10d0jlulq2woht49j5ccpeehu 
@@ -1412,6 +1471,16 @@
         foreign key (site_id) 
         references site;
 
+    alter table if exists tree 
+        add constraint FK_svg2ee45qvpomoer2otdc5oyc 
+        foreign key (current_tree_version_id) 
+        references tree_version;
+
+    alter table if exists tree 
+        add constraint FK_48skgw51tamg6ud4qa8oh0ycm 
+        foreign key (default_draft_tree_version_id) 
+        references tree_version;
+
     alter table if exists tree_arrangement 
         add constraint FK_akuqsiv75wpw6mk3m8gj6g30m 
         foreign key (base_arrangement_id) 
@@ -1426,6 +1495,11 @@
         add constraint FK_fvfq13j3dqv994o9vg54yj5kk 
         foreign key (node_id) 
         references tree_node;
+
+    alter table if exists tree_element 
+        add constraint FK_5sv181ivf7oybb6hud16ptmo5 
+        foreign key (previous_element_id) 
+        references tree_element;
 
     alter table if exists tree_event 
         add constraint FK_7y8cj9fpsh1sblm744xuq6i1g 
@@ -1521,6 +1595,31 @@
         add constraint FK_nw785lqesvg8ntfaper0tw2vs 
         foreign key (root_id) 
         references tree_arrangement;
+
+    alter table if exists tree_version 
+        add constraint FK_tiniptsqbb5fgygt1idm1isfy 
+        foreign key (previous_version_id) 
+        references tree_version;
+
+    alter table if exists tree_version 
+        add constraint FK_4q3huja5dv8t9xyvt5rg83a35 
+        foreign key (tree_id) 
+        references tree;
+
+    alter table if exists tree_version_element 
+        add constraint FK_8nnhwv8ldi9ppol6tg4uwn4qv 
+        foreign key (parent_id) 
+        references tree_version_element;
+
+    alter table if exists tree_version_element 
+        add constraint FK_ufme7yt6bqyf3uxvuvouowhh 
+        foreign key (tree_element_id) 
+        references tree_element;
+
+    alter table if exists tree_version_element 
+        add constraint FK_80khvm60q13xwqgpy43twlnoe 
+        foreign key (tree_version_id) 
+        references tree_version;
 
     
 
@@ -2436,7 +2535,16 @@ CREATE INDEX name_lower_unacent_full_name_gin_trgm
 CREATE INDEX name_lower_unacent_simple_name_gin_trgm
   ON name USING GIN (lower(f_unaccent(simple_name)) gin_trgm_ops);
 
-INSERT INTO db_version (id, version) VALUES (1, 23);
+-- new tree GIN indexes
+DROP INDEX IF EXISTS tree_synonyms_index;
+CREATE INDEX tree_synonyms_index
+  ON tree_element USING GIN (synonyms);
+
+-- new tree make sure the draft is not also the current version.
+ALTER TABLE tree
+  ADD CONSTRAINT draft_not_current CHECK (current_tree_version_id <> default_draft_tree_version_id);
+--
+INSERT INTO db_version (id, version) VALUES (1, 25);
 
 -- populate-lookup-tables.sql
 -- Populate lookup tables (currently botanical)
@@ -3103,6 +3211,7 @@ INSERT INTO public.shard_config (id, name, value) VALUES (nextval('hibernate_seq
 INSERT INTO public.shard_config (id, name, value) VALUES (nextval('hibernate_sequence'), 'classification tree key', 'APC');
 
 -- search-views.sql
+-- TODO remove - deprecated in new tree
 DROP VIEW IF EXISTS public.accepted_name_vw;
 CREATE VIEW public.accepted_name_vw AS
   SELECT
@@ -3140,6 +3249,7 @@ CREATE VIEW public.accepted_name_vw AS
         AND tree_node.checked_in_at_id IS NOT NULL
         AND instance.id = tree_node.instance_id;
 
+-- TODO remove - deprecated in new tree
 DROP VIEW IF EXISTS public.accepted_synonym_vw;
 CREATE VIEW public.accepted_synonym_vw AS
   SELECT
