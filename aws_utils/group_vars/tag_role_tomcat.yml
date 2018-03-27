@@ -24,6 +24,7 @@ Rails:
         services_clientside_root_url : "https://{{ elb_dns }}/nxl/services/"
         nsl_services : "https://{{ elb_dns }}/nxl/services/"
         nsl_links : "https://{{ elb_dns }}/nxl/services/"
+        nsl_linker : "https://{{ elb_dns }}/nsl/mapper/"
         services : "https://{{ elb_dns }}/nxl/services/"
         name_services : "https://{{ elb_dns }}/nxl/services/name/bpni/"
         reference_services : "https://{{ elb_dns }}/nxl/services/reference/bpni/"
