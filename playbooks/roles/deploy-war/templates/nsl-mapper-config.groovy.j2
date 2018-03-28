@@ -5,35 +5,41 @@ mapper {
     contextExtension = '' //extension to the context path (after nsl-mapper).
     defaultProtocol = 'http'
 
-    shards = [
+    defaultResolver = { ident ->
+            Map serviceHosts = [
+                    {{ shard_namespace }}: '{{mapper.shards.baseURL}}'
+            ]
+            String host = serviceHosts[ident.nameSpace]
+            if (ident.objectType == 'treeElement') {
+                return "${host}/nxl/services/rest/${ident.objectType}/${ident.versionNumber}/${ident.idNumber}"
+            }
+            if (ident.nameSpace == "foa") {
+                return "${host}/nxl/foa/taxa/${ident.idNumber}/summary"
+            }
+            return "${host}/nxl/services/rest/${ident.objectType}/${ident.nameSpace}/${ident.idNumber}"
+     }
 
-            '{{ shard_namespace }}'    : [
-                    baseURL: "{{mapper.shards.baseURL}}",
-                    service: [
-                            html: { ident ->
-                                "nxl/services/${ident.objectType}/${ident.nameSpace}/${ident.idNumber}"
-                            },
-                            json: { ident ->
-                                "nxl/services/${ident.objectType}/${ident.nameSpace}/${ident.idNumber}"
-                            },
-                            xml : { ident ->
-                                "nxl/services/${ident.objectType}/${ident.nameSpace}/${ident.idNumber}"
-                            },
-                            rdf : { ident ->
-                                String url = "DESCRIBE <http://biodiversity.org.au/boa/${ident.objectType}/${ident.nameSpace}/${ident.idNumber}>".encodeAsURL()
-                                "sparql/?query=${url}"
-                            }
-                    ]
+
+
+    format = [
+            html: [
+                    resolver: defaultResolver
             ],
-            foa     : [
-                    baseURL: 'http://biodiversity.org.au/',
-                    service: [
-                            html: { ident ->
-                                "foa/taxa/${ident.idNumber}/summary"
-                            },
-                    ]
+            json: [
+                    resolver: defaultResolver
+            ],
+            xml : [
+                    resolver: defaultResolver
+            ],
+            rdf : [
+                    resolver: { ident ->
+                        String url = "DESCRIBE <http://biodiversity.org.au/boa/${ident.objectType}/${ident.nameSpace}/${ident.idNumber}>".encodeAsURL()
+                        "sparql/?query=${url}"
+                    }
             ]
     ]
+
+
 }
 
 api.auth = [
